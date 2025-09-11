@@ -82,6 +82,7 @@ let frame = 0;
 
 
 const img = new Image();
+const imgBrick = new Image();
 
 img.onload = () => {
     const texture = gl.createTexture();
@@ -97,9 +98,23 @@ img.onload = () => {
     gl.uniform1i(gl.getUniformLocation(program, "uSky"), 2);//pass sky into uniform 
     draw();
 };
+imgBrick.onload = () => {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgBrick);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //remove line between pixels (smoothing texture)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); //if uvs are sampled outside of a range 0-1 (always do clamp to edge)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.useProgram(program);
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.uniform1i(gl.getUniformLocation(program, "uBrick"), 2);//pass sky into uniform 
+    draw();
+}
 
-img.src = "sky.png";
-
+img.src = "textures/sky.png";
+imgBrick.src = "textures/brick.png";
 function draw(){
     gl.useProgram(program);
 
