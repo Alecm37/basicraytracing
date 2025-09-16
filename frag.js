@@ -97,15 +97,27 @@ Surface shootRay(vec3 ro, vec3 rd){
 
     float tMin = 1e10; 
     vec3 sphereOffset = vec3(0., 2.0, 0.);
-    float sphere = sphIntersect(ro, rd, SPHERE_CENTER, SPHERE_RADIUS, sphereOffset).x;
-    if (sphere > 0.){
-        tMin = sphere; 
+    float sphereX = sphIntersect(ro, rd, SPHERE_CENTER, SPHERE_RADIUS, sphereOffset).x;
+    float sphereY = sphIntersect(ro, rd, SPHERE_CENTER, SPHERE_RADIUS, sphereOffset).y;
+
+    if (sphereX > 0.){
+        tMin = sphereX; 
         surface.hit = true; 
-        surface.position = ro + rd * sphere; 
+        surface.position = ro + rd * sphereX; 
         surface.normal = normalize(surface.position - SPHERE_CENTER - sphereOffset);
         surface.albedo = vec3(0.1, 0.4, 0.9); 
         surface.emission = vec3(0.2);
         surface.ior = 1.5;
+        surface.std = false; 
+    }
+    else if (sphereX < 0. && sphereY > 0.){
+        tMin = sphereY; 
+        surface.hit = true; 
+        surface.position = ro + rd * sphereY; 
+        surface.normal = -normalize(surface.position - SPHERE_CENTER - sphereOffset);
+        surface.albedo = vec3(0.1, 0.4, 0.9); 
+        surface.emission = vec3(0.2);
+        surface.ior = 1./1.5;
         surface.std = false; 
     }
     vec3 plaOffset = vec3(0.);
@@ -123,15 +135,26 @@ Surface shootRay(vec3 ro, vec3 rd){
     vec3 boxSize = vec3(0.5);
     vec3 boxNormal = vec3(0.);
     vec3 boxOffset = vec3(0., 0., 8.);
-    float box = boxIntersection(ro, rd, boxSize, boxNormal, boxOffset).x;
-    if (box > 0. && box < tMin){
-        tMin = box; 
+    float boxX = boxIntersection(ro, rd, boxSize, boxNormal, boxOffset).x;
+    float boxY = boxIntersection(ro, rd, boxSize, boxNormal, boxOffset).y;
+    if (boxX > 0. && boxX < tMin){
+        tMin = boxX; 
         surface.hit = true; 
-        surface.position = ro+rd*box; 
+        surface.position = ro+rd*boxX; 
         surface.normal = boxNormal;
         surface.albedo = vec3(0.4, 0.4, 0.4);
         surface.emission = vec3(0.);
         surface.ior = 1.5; 
+        surface.std = false; 
+    }
+    else if (boxX < 0. && boxY < tMin && boxY > 0.){
+        tMin = boxY; 
+        surface.hit = true; 
+        surface.position = ro + rd * boxY; 
+        surface.normal = -boxNormal;
+        surface.albedo = vec3(0.1, 0.4, 0.9); 
+        surface.emission = vec3(0.2);
+        surface.ior = 1./1.5;
         surface.std = false; 
     }
     vec3 lightBoxSize = vec3(0.5);
